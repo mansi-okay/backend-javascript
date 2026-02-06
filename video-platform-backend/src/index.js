@@ -1,12 +1,37 @@
+// overrode DNS resolution inside the Node.js runtime using dns/promises.setServers()
+import { setServers } from "node:dns/promises";
+setServers(["1.1.1.1", "8.8.8.8"]);
 // require('dotenv').config({path: './env'})
 import dotenv from "dotenv";
 dotenv.config({
-    path: "./.env",
+    path: "./env",
 });
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 
 connectDB()
+.then((response) => {
+
+    app.listen(process.env.PORT || 8000, () => {
+        // .listen starts the express server
+        console.log(`Epress server started and it's running on port: ${process.env.PORT}`);  
+    })
+
+})
+.catch((error) => {
+    console.log("MongoDB connection failed: ", error);   
+})
+
+
+
+
+
+
+
+
+
+
 
 
 /*

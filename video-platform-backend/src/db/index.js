@@ -1,7 +1,3 @@
-// overrode DNS resolution inside the Node.js runtime using dns/promises.setServers()
-import { setServers } from "node:dns/promises";
-setServers(["1.1.1.1", "8.8.8.8"]);
-
 import mongoose from "mongoose";
 import { DB_NAME } from "../constants.js";
 
@@ -15,7 +11,7 @@ const connectDB = async () => {
         console.log(`\n MongoDB connected !! DB HOST: ${
             connectionInstance.connection.host
         }`);
-        
+        return connectionInstance
     } catch (error) {
         console.log("MONGODB connection FAILED: ", error);
 
