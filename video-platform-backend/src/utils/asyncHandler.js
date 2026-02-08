@@ -6,7 +6,7 @@ const asyncHandler = (requestHandler) => {
         Promise.resolve(requestHandler(req,res,next))
         .catch((error) => next(error))  
          //next() -> move to next normal middleware / route handler
-         // next(error) -> Next error handling middleware
+         // next(error) -> Next error handling middleware whose signature is (err, req, res, next)
     }
 }
 
@@ -15,6 +15,7 @@ export {asyncHandler}
 
 /*
 // try catch async handler
+// Do not write (err, req, res, next) for controllers or async handlers
 // used asyncHandler to handle errors of async functions automatically
 // const function = () => () => {}  //OR
 // const function = () => (() => {})  //OR
@@ -24,9 +25,9 @@ export {asyncHandler}
 
 // fn(req, res, next) is your async task
 // async (req, res, next) is the wrapper that runs fn safely
-const asyncHandler = (fn) => async (err,req,res,next) => {
+const asyncHandler = (fn) => async (req,res,next) => {
     try {
-        await fn(request,response,next)
+        await fn(req,res,next)
     } catch (error){
         res.status(error.code || 500)
         .json({
