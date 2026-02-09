@@ -7,6 +7,8 @@ const app = express();
 // .use() whenever we are using a midleware 
 // it is used to configure the server
 
+// Configurations 
+
 // handling cors
 app.use(cors(
     {
@@ -28,6 +30,13 @@ app.use(express.urlencoded(
 app.use(express.static("public"))
 
 // browser can store & send cookies and server can read cookies
-app.use(cookieparser)
+app.use(cookieparser())     // bug fix: previous-> app.use(cookieparser) 
+
+// Import routes
+import userRouter from "./routes/user.routes.js"
+
+// routes declare
+app.use("/api/v1/users",userRouter)   //bug fix: previous -> app.use("api/v1/users",userRouter)
+// http://localhost:8000/api/v1/users/register 
 
 export { app }
