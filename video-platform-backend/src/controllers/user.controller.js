@@ -27,25 +27,31 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     //findOne -> whichever first user matches it returns it
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         $or: [{username},{email}]
     })
     if (existingUser) {
         throw new ApiError(400, "User already exists") 
     }
 
-    const avatarLocalPath = req.files?.avatar[0]?.path;     //print files
-    const coverImageLocalPath = req.files?.coverimage[0]?.path;
+    // console.log(req.files);  
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;     //print files
+    const coverImageLocalPath = req.files?.coverimage?.[0]?.path; 
 
     if (!avatarLocalPath){
         throw new ApiError(400, "Avatar required")
     }
 
     const avatar = await uploadFileOnCloudinary(avatarLocalPath)
-    const coverimage = await  uploadFileOnCloudinary(coverImageLocalPath)
+    // console.log(avatar)  //response
 
     if (!avatar){
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(400, "Avatar upload failed")
+    }
+
+    let coverimage
+    if (coverImageLocalPath){
+        coverimage = await  uploadFileOnCloudinary(coverImageLocalPath)
     }
 
     const user = await User.create({

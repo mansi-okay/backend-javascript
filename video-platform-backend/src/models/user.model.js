@@ -53,11 +53,11 @@ const userSchema = new Schema(
     })
 
 
-// .pre middleware here used to modify(encypt) data before saving
-userSchema.pre("save", async function (next) {
+// .pre hook here used to modify(encypt) data before saving
+// only Express middleware functions take next not Mongoose Middleware (Hooks)
+userSchema.pre("save", async function () {     // bug fix:  async function (next) ->  async function ()
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password,7)
-    next()
 })
 
 // checking if password correct
