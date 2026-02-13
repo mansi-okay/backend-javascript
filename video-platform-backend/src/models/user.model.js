@@ -29,8 +29,7 @@ const userSchema = new Schema(
         password: {
             type: String,
             required: [true, "Password is required"],
-            unique: true,
-            lowercase: true,
+            // bug fix => removed lowercase: true,  unique: true
             trim:true            
         },
         avatar: {
@@ -54,9 +53,10 @@ const userSchema = new Schema(
 
 
 // .pre hook here used to modify(encypt) data before saving
-// only Express middleware functions take next not Mongoose Middleware (Hooks)
+// Express middlware => async or not -> usually use next()
+// Mongoose middlewares => async -> no next()   and  non-async ->  use next()
 userSchema.pre("save", async function () {     // bug fix:  async function (next) ->  async function ()
-    if (!this.isModified("password")) return next();
+    if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password,7)
 })
 
@@ -65,7 +65,7 @@ userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 
-// Access Token -> shrt term, use this to get data
+// Access Token -> short term, use this to get data
 userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
@@ -76,7 +76,7 @@ userSchema.methods.generateAccessToken = function(){
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-        expiresIn: ACCESS_TOKEN_EXPIRY
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     }
 )
 }
@@ -91,7 +91,7 @@ userSchema.methods.generateRefreshToken = function(){
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-        expiresIn: REFRESH_TOKEN_EXPIRY
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     }
 )    
 }
