@@ -60,6 +60,7 @@ userSchema.pre("save", async function () {     // bug fix:  async function (next
     this.password = await bcrypt.hash(this.password,7)
 })
 
+// never decrypt password
 // checking if password correct
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)

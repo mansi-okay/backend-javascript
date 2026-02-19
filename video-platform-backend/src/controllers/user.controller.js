@@ -150,15 +150,22 @@ const loginUser = asyncHandler(async(req,res) => {
 const logOut = asyncHandler(async (req,res) => {
     // refresh token expire ho jab logout
     // or user logs out themselves 
-        await User.findByIdAndUpdate(
-        req.user._id,
+
+    // finds the user and updates simultaneously
+    // (id, update, options)
+    await User.findByIdAndUpdate(
+    req.user._id,
         {
-            $set: {
-                refreshToken: undefined // this removes the field from document
+            // $set: {
+            //     refreshToken: undefined // this removes the field from document
+            // }
+            $unset: {
+                refreshToken: 1 // this removes the field from document
             }
         },
         {
-            new: true
+            new: true   // Returns the updated document (after changes)
+            // without new: true -> Returns the old document (before changes)
         }
     )
 

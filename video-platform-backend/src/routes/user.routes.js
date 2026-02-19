@@ -6,7 +6,7 @@ import { verifyJWT } from "../middlewares/auth.js";
 
 const router = Router();
 
-router.route("/register").post(upload.fields([
+router.route("/register").post(upload.fields([   // after using multer middleware got access to req.files
     {
         name: "avatar",
         maxCount: 1
@@ -19,6 +19,8 @@ router.route("/register").post(upload.fields([
 
 router.route("/login").post(loginUser)
 
-router.route("/logout").post(verifyJWT, logOut)
+//secured routes
+router.route("/logout").post(verifyJWT, logOut)   // after using middleware verfyJWT got access to req.user
+// next() makes the 
 
 export default router
