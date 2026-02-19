@@ -212,7 +212,10 @@ const refreshAccessToken = asyncHandler(async (req,res) => {
 
         // This pattern is called refresh token rotation
         // more secure as we are regenrating refresh token 
-        const {accessToken, newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
+        const {accessToken, refreshToken: newRefreshToken} = await generateAccessandRefreshTokens(user._id)
+        // bug fix ->  no property called newRefreshToken in the returned object in generateAccessandRefreshTokens
+        // so correctly destructure and rename refreshToken otherwise newRefreshToken=undefined
+
 
         return res
         .status(200)
@@ -221,7 +224,7 @@ const refreshAccessToken = asyncHandler(async (req,res) => {
         .json(
             new ApiResponse(
                 200, 
-                {accessToken, refreshToken: newRefreshToken},
+                {accessToken, newRefreshToken},
                 "Access token refreshed"
             )
         )
