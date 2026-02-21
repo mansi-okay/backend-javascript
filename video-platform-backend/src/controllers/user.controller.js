@@ -1,7 +1,7 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {User} from  "../models/user.model.js"
-import {uploadFileOnCloudinary} from "../utils/cloudinary.js"
+import {uploadFileOnCloudinary, deleteFromCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import jwt, { decode } from "jsonwebtoken"
 
@@ -79,7 +79,10 @@ const registerUser = asyncHandler(async (req, res) => {
         fullname,
         email,
         password,
-        avatar: avatar.url,
+        avatar: {
+            url: avatar.url,
+            public_id: avatar.public_id
+        },
         coverimage: coverimage?.url || ""
     })
 
@@ -115,7 +118,7 @@ const loginUser = asyncHandler(async(req,res) => {
 
     const existingUser = await User.findOne({
         $or : [{username},{email}]
-    })
+    })    
 
     if (!existingUser){
         throw new ApiError(400,"User does not exist")
@@ -326,17 +329,30 @@ const updateAvatar = asyncHandler(async(req,res) => {
         throw new ApiError(400, "Avatar file missing")
     }
 
+    const existingUser = await User.findById(req.user?._id)
+
+    if(!existingUser){
+        throw new ApiError(400,"User does not exist");        
+    }
+
     const avatar = await uploadFileOnCloudinary(avatarLocalPath)
 
     if (!avatar?.url){
         throw new ApiError(400, "Avatar upload failed")
     }
 
+    if (existingUser.avatar?.public_id) {
+        await deleteFromCloudinary(existingUser.avatar.public_id);
+    }
+
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                avatar: avatar.url
+                avatar: {
+                    url: avatar.url,
+                    public_id: avatar.public_id
+                }
             }
         },
         {
@@ -365,6 +381,8 @@ const updateCoverImage = asyncHandler(async(req,res) => {
     }
 
     const coverimage = await uploadFileOnCloudinary(coverImageLocalPath)
+    console.log(coverimage);
+    
 
     if (!coverimage?.url){
         throw new ApiError(400, "Cover image upload failed")

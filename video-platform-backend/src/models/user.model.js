@@ -33,8 +33,14 @@ const userSchema = new Schema(
             trim:true            
         },
         avatar: {
-            type: String, // cloudinary url
-            required: true,
+            url: {
+                type: String,   // cloudinary url
+                required: true
+            },
+            public_id: {
+                type: String,      // cloudinary public_id
+                required: true
+            }
         },
         coverimage: {
             type: String    // cloudinary url
