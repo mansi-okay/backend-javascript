@@ -24,6 +24,9 @@ export {asyncHandler}
 // }
 
 // fn(req, res, next) is your async task
+// Ends the response -> no next() needed in fn
+// Passes control onward -> must call next() in fn
+
 // async (req, res, next) is the wrapper that runs fn safely
 const asyncHandler = (fn) => async (req,res,next) => {
     try {
